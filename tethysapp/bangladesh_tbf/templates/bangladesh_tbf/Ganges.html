@@ -1,0 +1,11 @@
+{% extends "bangladesh_tbf/base.html" %}
+
+{% load tethys_gizmos %}
+
+{% block app_content %}
+  <h1>Bangladesh Transboundary Stream Flow</h1>
+  <h2>Ganges River Crossing</h2>
+  {% gizmo plot_view tbf_plot %}
+
+<!--{{ tbf_plot }}-->
+{% endblock %}
