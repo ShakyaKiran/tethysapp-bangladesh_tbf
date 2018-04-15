@@ -1,0 +1,11 @@
+.points{
+    border: 1px solid #000;
+    border-radius: 10px;
+    display: block;
+    margin: auto;
+}
+
+.myfonts {
+    font-family: "Times New Roman", Georgia, Serif;
+    font-size: medium;
+}

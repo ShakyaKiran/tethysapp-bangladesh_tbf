@@ -5,8 +5,12 @@
     {% csrf_token %}
     {% gizmo map_options %}
     <!--{% gizmo plot_view tbf_plot %}-->
-
-    <div id="plotter" name="plotter" style="height:400px;width:100%" ></div>
-
+<div class="row">
+    <section col-lg-12>
+            <div id="home" class="tab-pane fade in active">
+                <div id="plotter" name="plotter"></div>
+            </div>
+    </section>
+</div>
 {% endblock %}
 

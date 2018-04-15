@@ -1,8 +1,7 @@
 //Get the select value in the map, extract comid and send to python for the data to plot
 $(function() { //wait for page to load
-
+    get_time_seriesNew('58532');
     var mapjs = TETHYS_MAP_VIEW.getMap();
-
     var vectorLayer = mapjs.getLayers().getArray()[1]
     select_interaction = new ol.interaction.Select({
         layers: [vectorLayer],
@@ -10,11 +9,24 @@ $(function() { //wait for page to load
     mapjs.addInteraction(select_interaction);
 
     select_interaction.on('select', function (e) {
-
         var comid = e.selected[0].get('comid');
         get_time_seriesNew(comid);
     });
 });
+
+function myFormat(timestamp) {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    var period, t;
+    t = new Date(timestamp);
+    if (t.getHours() === 0 ) {
+        period = monthNames[t.getMonth()] + " " + (t.getDate());
+    }
+    else {
+        period = "";
+    }
+    // period =  monthNames[t.getMonth()] + " " + (t.getDate() + ", T ") + (t.getHours() + ":") + (t.getMinutes());
+    return period;
+}
 
 $.ajaxSetup({
             beforeSend: function (xhr, settings) {
@@ -81,14 +93,15 @@ get_time_seriesNew = function(myID){
                 var vstdlower = [];
                 var vUpper = [];
                 var vLower = []
-                if (json_response.success == "success"){
-                    for (i in json_response.dateTimewa) {
+                if (json_response.success == "success")
+                {
+                    json_response.dateTimewa.forEach(function (element) {
 
                         // xVal1 = new Date(JSON.stringify(json_response.dateTimewa[i])); //.substring(1,11)));
                         // alert(json_response.dateTimewa[i]);
                         // alert(JSON.stringify(json_response.dateTimewa[i]));
-                        xVal.push(json_response.dateTimewa[i]);
-                    }
+                        xVal.push(element);
+                    });
 
                     for (i in json_response.valuemean) {
                         vMean.push(parseFloat(json_response.valuemean[i]));
@@ -119,6 +132,20 @@ get_time_seriesNew = function(myID){
                         credits: {
                             enabled: false
                         },
+                        tooltip:{
+                            shared: true,
+                            useHTML: true,
+                            formatter: function () {
+                                // var s ='<b>' + json_response.display_name + '<br/>';
+                                var s = '<h5>' + this.x.replace("T", " T") + '</h5><table>';
+                                $.each(this.points, function () {
+                                    s += '<tr><td>' + this.series.name + '</td><td>: ' + this.y + '</td></tr>';
+                                });
+                                s += '</table>'
+                                return s;
+                            }
+
+                        },
                         title: {
                             text: json_response.display_name,  //+ " values at " +json_response.location,
                             style: {
@@ -127,11 +154,13 @@ get_time_seriesNew = function(myID){
                         },
                         xAxis: {
                             categories: xVal,
-                            type: 'datetime',
+                            type: 'date',
                             labels: {
-                                // format: '{value: %Y}',
-                                rotation: 45,
-                                align: 'left'
+                                formatter: function () {
+                                    return myFormat(this.value);
+                                },
+                                rotation: -45,
+                                align: 'right'
                             },
                             title: {
                                 text: 'Date Time'
@@ -141,22 +170,10 @@ get_time_seriesNew = function(myID){
                             title: {
                                 text: "Flow Prediction (cm)" //json_response.units
                             }
-
                         },
                         exporting: {
                             enabled: true
                         },
-                        // plotOptions: {
-                        //     area: {
-                        //         stacking: 'normal',
-                        //         lineColor: '#666666',
-                        //         lineWidth: 1,
-                        //         marker: {
-                        //             lineWidth: 1,
-                        //             lineColor: '#666666'
-                        //         }
-                        //     }
-                        // },
                         series: [
                             {
                                 data: vUpper,
@@ -164,7 +181,8 @@ get_time_seriesNew = function(myID){
                             },
                             {
                                 data:vMean,
-                                name: "Mean"
+                                name: "Mean",
+                                pointPlacement: 'on'
                             },
                             {
                                 data: vstdupper,
@@ -173,8 +191,7 @@ get_time_seriesNew = function(myID){
                             {
                                 data: vstdlower,
                                 name: "StdDev Range Lower"
-                            }
-                            ,
+                            },
                             {
                                 data: vLower,
                                 name: "Outer Range Lower"

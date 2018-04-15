@@ -5,7 +5,6 @@ class BangladeshTbf(TethysAppBase):
     """
     Tethys app class for Bangladesh Tbf.
     """
-
     name = 'Streamflow Prediction for Bangladesh'
     index = 'bangladesh_tbf:home'
     icon = 'bangladesh_tbf/images/ICIMOD_Logo_White.gif'
